@@ -1,38 +1,26 @@
-// Função que busca a string e clica no último botão
 function tryAutoClick() {
-    const bodyText = document.body.innerText || "";
-    if (!bodyText.includes("The server is busy. Please try again later.")) {
+    // 1. Confere se a mensagem de erro está presente
+    if (!document.body.innerText.includes("The server is busy. Please try again later.")) {
       return;
     }
   
-    // Seleciona todos os botões com a classe ds-icon-button
-    const buttons = Array.from(document.querySelectorAll(".ds-icon-button"));
-    if (buttons.length === 0) {
-      return;
-    }
+    // 2. Seleciona o contêiner específico de ícones de regenerar
+    const flexContainer = document.querySelector("div.ds-flex._965abe9");
+    if (!flexContainer) return;
   
-    // Pega o último e dispara o clique
-    const lastButton = buttons[buttons.length - 1];
-    lastButton.click();
-    console.log("[Auto‑Clicker] Botão clicado automaticamente.");
+    // 3. Extrai o primeiro ícone dentro do container (o refresh)
+    const [refreshBtn] = flexContainer.querySelectorAll("div.ds-icon-button");
+    if (!refreshBtn) return;
+  
+    // 4. Dispara o clique
+    refreshBtn.click();
+    console.log("[Auto‑Clicker] Botão 'Regenerar' clicado.");
   }
   
-  // Observa mudanças no DOM para capturar atualizações dinâmicas
-  const observer = new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      if (m.addedNodes.length || m.type === "childList") {
-        tryAutoClick();
-        break;
-      }
-    }
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      tryAutoClick();
+      intervalId = setInterval(tryAutoClick, 3000);
+    }, 2000);
   });
-  
-  // Inicia observação
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-  
-  // Também tenta logo na carga inicial, caso o texto já esteja presente
-  window.addEventListener("load", tryAutoClick);
   
